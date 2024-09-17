@@ -16,3 +16,8 @@ export const exampleThemeStorage: ThemeStorage = {
     });
   },
 };
+
+export const tabIdStorage = createStorage<number>('tabId-storage-key', 0, {
+  storageEnum: StorageEnum.Local,
+  liveUpdate: true,
+});

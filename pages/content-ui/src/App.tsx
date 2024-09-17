@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { Button } from '@extension/ui';
 import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
+import { Button } from '@extension/ui';
+import { useEffect } from 'react';
 
 export default function App() {
   const theme = useStorage(exampleThemeStorage);
@@ -9,6 +9,12 @@ export default function App() {
   useEffect(() => {
     console.log('content ui loaded');
   }, []);
+
+  const hello = true;
+
+  if (hello) {
+    return <></>;
+  }
 
   return (
     <div className="flex items-center justify-between gap-2 bg-blue-100 rounded py-1 px-2">

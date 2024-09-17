@@ -1,39 +1,27 @@
-import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
-import type { ComponentPropsWithoutRef } from 'react';
+import { tabIdStorage } from '@extension/storage/lib/exampleThemeStorage';
+import '@src/SidePanel.css';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
   const logo = isLight ? 'side-panel/logo_vertical.svg' : 'side-panel/logo_vertical_dark.svg';
 
+  const getTabInfo = async () => {
+    const tabId = await tabIdStorage.get();
+    const response = chrome.runtime.sendMessage({ action: 'getTabInfo', tabId }, {}, response => {
+      console.log('response', response);
+    });
+    console.log(response);
+  };
+
   return (
     <div className={`App ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
-        <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>pages/side-panel/src/SidePanel.tsx</code>
-        </p>
-        <ToggleButton>Toggle theme</ToggleButton>
-      </header>
+      <button className="bg-blue-500 text-white p-2 rounded" onClick={getTabInfo}>
+        Get Tab Info
+      </button>
     </div>
-  );
-};
-
-const ToggleButton = (props: ComponentPropsWithoutRef<'button'>) => {
-  const theme = useStorage(exampleThemeStorage);
-  return (
-    <button
-      className={
-        props.className +
-        ' ' +
-        'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
-        (theme === 'light' ? 'bg-white text-black' : 'bg-black text-white')
-      }
-      onClick={exampleThemeStorage.toggle}>
-      {props.children}
-    </button>
   );
 };
 

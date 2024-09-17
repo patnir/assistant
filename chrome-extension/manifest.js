@@ -1,5 +1,5 @@
-import fs from 'node:fs';
 import deepmerge from 'deepmerge';
+import fs from 'node:fs';
 
 const packageJson = JSON.parse(fs.readFileSync('../package.json', 'utf8'));
 
@@ -28,7 +28,7 @@ const manifest = deepmerge(
     version: packageJson.version,
     description: '__MSG_extensionDescription__',
     host_permissions: ['<all_urls>'],
-    permissions: ['storage', 'scripting', 'tabs', 'notifications'],
+    permissions: ['storage', 'scripting', 'tabs', 'notifications', 'activeTab'],
     options_page: 'options/index.html',
     background: {
       service_worker: 'background.iife.js',
