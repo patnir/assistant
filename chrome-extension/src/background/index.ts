@@ -1,5 +1,5 @@
 import { exampleThemeStorage } from '@extension/storage';
-import { tabIdStorage } from '@extension/storage/lib/exampleThemeStorage';
+import { Comment, commentsStorageExtended, tabIdStorage } from '@extension/storage/lib/exampleThemeStorage';
 
 import 'webextension-polyfill';
 
@@ -17,6 +17,22 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     tabIdStorage.set(tabId).then(() => {
       console.log('tabId set', tabId);
     });
+
+    console.log('tab.url', tab.url);
+
+    commentsStorageExtended?.getByUrl(tab.url).then(comments => {
+      for (const comment of comments) {
+        console.log('comment', comment);
+        const commentElement = document.createElement('div');
+        commentElement.style.position = 'fixed';
+        commentElement.style.top = comment.top;
+        commentElement.style.left = comment.left;
+        commentElement.style.backgroundColor = 'red';
+        commentElement.style.zIndex = '10000000';
+        commentElement.innerHTML = comment.text;
+        document.body.appendChild(commentElement);
+      }
+    });
   }
 
   // need to check if there are comments stored in storage
@@ -27,15 +43,15 @@ const openSidePanel = (tabId: number) => {
   chrome.sidePanel.open({ tabId });
 };
 
-function reddenPage() {
-  document.body.style.backgroundColor = 'red';
+function storeComment(comment: Comment) {
+  commentsStorageExtended?.add(comment);
 }
 
-function insertReddenButton() {
+function insertReddenButton(tabId: number) {
   const topBanner = document.createElement('div');
   topBanner.style.position = 'fixed';
   topBanner.style.top = '10px';
-  topBanner.style.right = '10px';
+  topBanner.style.left = '10px';
   topBanner.style.width = '21px';
   topBanner.style.height = '21px';
   topBanner.style.backgroundColor = 'red';
@@ -80,6 +96,26 @@ function insertReddenButton() {
     console.log('url', url);
     console.log('topBanner', topBanner.style.top, topBanner.style.left);
     // chrome.storage.local.set({ top: topBanner.style.top, left: topBanner.style.left, url: url.hostname });
+    console.log('url.hostname', url.href);
+    if (chrome.scripting) {
+      // {{ edit_1 }}
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        func: storeComment,
+        args: [
+          {
+            text: 'Hello',
+            top: topBanner.style.top,
+            left: topBanner.style.left,
+            url: url.href,
+            id: '1',
+            createdAt: Date.now(),
+          },
+        ],
+      });
+    } else {
+      console.error('chrome.scripting is not available');
+    }
   });
 }
 
@@ -98,6 +134,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     chrome.scripting.executeScript({
       target: { tabId: request.tabId },
       func: insertReddenButton,
+      args: [request.tabId],
     });
   }
 });

@@ -24,8 +24,8 @@ export const tabIdStorage = createStorage<number>('tabId-storage-key', 0, {
 
 export type Comment = {
   text: string;
-  top: number;
-  left: number;
+  top: string;
+  left: string;
   id: string;
   url: string;
   createdAt: number;
@@ -35,3 +35,20 @@ export const commentsStorage = createStorage<Comment[]>('comments-storage-key', 
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
 });
+
+export const commentsStorageExtended = {
+  ...commentsStorage,
+  add: async (comment: Comment) => {
+    await commentsStorage.set(comments => [...comments, comment]);
+  },
+  remove: async (id: string) => {
+    await commentsStorage.set(comments => comments.filter(comment => comment.id !== id));
+  },
+  getByUrl: async (url: string) => {
+    const comments = await commentsStorage.get();
+    return comments.filter(comment => comment.url === url);
+  },
+  getAll: async () => {
+    return await commentsStorage.get();
+  },
+};
