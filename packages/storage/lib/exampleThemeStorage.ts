@@ -21,3 +21,17 @@ export const tabIdStorage = createStorage<number>('tabId-storage-key', 0, {
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
 });
+
+export type Comment = {
+  text: string;
+  top: number;
+  left: number;
+  id: string;
+  url: string;
+  createdAt: number;
+};
+
+export const commentsStorage = createStorage<Comment[]>('comments-storage-key', [], {
+  storageEnum: StorageEnum.Local,
+  liveUpdate: true,
+});
