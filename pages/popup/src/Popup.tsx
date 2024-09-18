@@ -10,14 +10,6 @@ const notificationOptions = {
   message: 'You cannot inject script here!',
 } as const;
 
-const loadComments = async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  console.log('loading tab', tab);
-  if (tab.id) {
-    await chrome.tabs.sendMessage(tab.id, { action: 'loadComments' });
-  }
-};
-
 const Popup = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
@@ -128,21 +120,5 @@ const Popup = () => {
     </div>
   );
 };
-
-// const ToggleButton = (props: ComponentPropsWithoutRef<'button'>) => {
-//   const theme = useStorage(exampleThemeStorage);
-//   return (
-//     <button
-//       className={
-//         props.className +
-//         ' ' +
-//         'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
-//         (theme === 'light' ? 'bg-white text-black shadow-black' : 'bg-black text-white')
-//       }
-//       onClick={exampleThemeStorage.toggle}>
-//       {props.children}
-//     </button>
-//   );
-// };
 
 export default withErrorBoundary(withSuspense(Popup, <div> Loading ... </div>), <div> Error Occur </div>);

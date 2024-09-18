@@ -24,18 +24,20 @@ export const tabIdStorage = createStorage<number>('tabId-storage-key', 0, {
 
 export type Comment = {
   text: string;
-  top: string;
-  left: string;
   id: string;
   url: string;
   createdAt: number;
+  anchorPath: string;
+  offsetX: number;
+  offsetY: number;
 };
 
 export type CommentUpdate = {
   id: string;
   text: string;
-  top: string;
-  left: string;
+  anchorPath: string;
+  offsetX: number;
+  offsetY: number;
 };
 
 export const commentsStorage = createStorage<Comment[]>('comments-storage-key', [], {
