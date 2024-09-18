@@ -27,7 +27,7 @@ export type Comment = {
   id: string;
   url: string;
   createdAt: number;
-  anchorPath: string;
+  selector: string;
   offsetX: number;
   offsetY: number;
 };
@@ -35,7 +35,7 @@ export type Comment = {
 export type CommentUpdate = {
   id: string;
   text: string;
-  anchorPath: string;
+  selector: string;
   offsetX: number;
   offsetY: number;
 };
