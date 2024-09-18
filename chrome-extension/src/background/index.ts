@@ -1,5 +1,6 @@
 import { exampleThemeStorage } from '@extension/storage';
-import { Comment, commentsStorageExtended, tabIdStorage } from '@extension/storage/lib/exampleThemeStorage';
+import type { Comment } from '@extension/storage/lib/exampleThemeStorage';
+import { commentsStorageExtended, tabIdStorage } from '@extension/storage/lib/exampleThemeStorage';
 
 import 'webextension-polyfill';
 
@@ -23,14 +24,20 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     commentsStorageExtended?.getByUrl(tab.url).then(comments => {
       for (const comment of comments) {
         console.log('comment', comment);
-        const commentElement = document.createElement('div');
-        commentElement.style.position = 'fixed';
-        commentElement.style.top = comment.top;
-        commentElement.style.left = comment.left;
-        commentElement.style.backgroundColor = 'red';
-        commentElement.style.zIndex = '10000000';
-        commentElement.innerHTML = comment.text;
-        document.body.appendChild(commentElement);
+        chrome.scripting.executeScript({
+          target: { tabId: tabId },
+          func: comment => {
+            const commentElement = document.createElement('div');
+            commentElement.style.position = 'fixed';
+            commentElement.style.top = comment.top;
+            commentElement.style.left = comment.left;
+            commentElement.style.backgroundColor = 'red';
+            commentElement.style.zIndex = '10000000';
+            commentElement.innerHTML = comment.text;
+            document.body.appendChild(commentElement);
+          },
+          args: [comment],
+        });
       }
     });
   }
@@ -74,7 +81,7 @@ function insertReddenButton(tabId: number) {
 
   // Draggable functionality
   let isDragging = false;
-  let offset = { x: 0, y: 0 };
+  const offset = { x: 0, y: 0 };
 
   topBanner.addEventListener('mousedown', e => {
     isDragging = true;
@@ -136,5 +143,27 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       func: insertReddenButton,
       args: [request.tabId],
     });
+  }
+
+  if (request.action === 'seedRandomComments') {
+    const tab = await chrome.tabs.get(request.tabId);
+    console.log('tab', tab);
+    const url = new URL(tab.url).href;
+    console.log('url', url);
+    const randomTop = Math.floor(Math.random() * 1000);
+    const randomLeft = Math.floor(Math.random() * 1000);
+
+    const comment = {
+      text: 'Hello',
+      top: `${randomTop}px`,
+      left: `${randomLeft}px`,
+      url: url,
+      id: '1',
+      createdAt: Date.now(),
+    };
+
+    console.log('comment', comment);
+
+    await commentsStorageExtended.add(comment);
   }
 });
