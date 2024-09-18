@@ -21,6 +21,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
     console.log('tab.url', tab.url);
 
+    const stopLoadingComments = true;
+
+    if (stopLoadingComments) {
+      return;
+    }
+
     commentsStorageExtended?.getByUrl(tab.url).then(comments => {
       for (const comment of comments) {
         console.log('comment', comment);

@@ -10,6 +10,14 @@ const notificationOptions = {
   message: 'You cannot inject script here!',
 } as const;
 
+const loadComments = async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  console.log('loading tab', tab);
+  if (tab.id) {
+    await chrome.tabs.sendMessage(tab.id, { action: 'loadComments' });
+  }
+};
+
 const Popup = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
@@ -81,7 +89,7 @@ const Popup = () => {
               chrome.tabs.sendMessage(
                 tab.id,
                 {
-                  action: 'contentScriptAlert',
+                  action: 'createComment',
                 },
                 response => {
                   console.log(response);
@@ -92,6 +100,29 @@ const Popup = () => {
             }
           }}>
           Content Script Alert
+        </button>
+        <button
+          className={
+            'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
+            (isLight ? 'bg-blue-200 text-black' : 'bg-gray-700 text-white')
+          }
+          onClick={async () => {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab.id) {
+              chrome.tabs.sendMessage(
+                tab.id,
+                {
+                  action: 'loadComments',
+                },
+                response => {
+                  console.log(response);
+                },
+              );
+            } else {
+              console.error('Tab id not found');
+            }
+          }}>
+          Load Comments
         </button>
       </header>
     </div>

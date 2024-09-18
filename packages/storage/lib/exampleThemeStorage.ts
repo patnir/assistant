@@ -31,6 +31,13 @@ export type Comment = {
   createdAt: number;
 };
 
+export type CommentUpdate = {
+  id: string;
+  text: string;
+  top: string;
+  left: string;
+};
+
 export const commentsStorage = createStorage<Comment[]>('comments-storage-key', [], {
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
@@ -40,6 +47,16 @@ export const commentsStorageExtended = {
   ...commentsStorage,
   add: async (comment: Comment) => {
     await commentsStorage.set(comments => [...comments, comment]);
+  },
+  update: async (comment: CommentUpdate) => {
+    await commentsStorage.set(comments => {
+      const commentIndex = comments.findIndex(c => c.id === comment.id);
+      if (commentIndex === -1) {
+        return comments;
+      }
+      comments[commentIndex] = { ...comments[commentIndex], ...comment };
+      return comments;
+    });
   },
   remove: async (id: string) => {
     await commentsStorage.set(comments => comments.filter(comment => comment.id !== id));
