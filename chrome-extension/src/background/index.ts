@@ -148,7 +148,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.action === 'seedRandomComments') {
     const tab = await chrome.tabs.get(request.tabId);
     console.log('tab', tab);
-    const url = new URL(tab.url).href;
+    const url = new URL(tab.url!).href;
     console.log('url', url);
     const randomTop = Math.floor(Math.random() * 1000);
     const randomLeft = Math.floor(Math.random() * 1000);
