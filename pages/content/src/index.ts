@@ -116,7 +116,15 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 });
 
 // Load comments when the page loads
-window.addEventListener('load', loadCommentsFromStorage);
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('page loaded');
+});
+
+window.addEventListener('load', function () {
+  // alert("It's loaded!")
+});
 
 // Reposition comments on window resize
-window.addEventListener('resize', loadCommentsFromStorage);
+window.addEventListener('resize', () => {
+  console.log('resizing');
+});
