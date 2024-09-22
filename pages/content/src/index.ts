@@ -94,6 +94,26 @@ const saveNewComment = async (id: string, offsetX: number, offsetY: number, text
   await commentsStorageExtended.add(newComment);
 };
 
+const shareComments = async () => {
+  console.log('sharing comments');
+
+  const comments = await commentsStorageExtended.getByUrl(window.location.href);
+  const result = [];
+  for (const comment of comments) {
+    result.push({
+      id: comment.id,
+      text: comment.text,
+      url: comment.url,
+      createdAt: comment.createdAt,
+      offsetX: comment.offsetX,
+      offsetY: comment.offsetY,
+      selector: comment.selector,
+    });
+  }
+
+  return result;
+};
+
 const loadCommentsFromStorage = async () => {
   console.log('loading comments from storage');
   const comments = await commentsStorageExtended.getByUrl(window.location.href);
@@ -102,17 +122,31 @@ const loadCommentsFromStorage = async () => {
   comments.forEach(comment => createComment(document, comment));
 };
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('request', request);
 
   if (request.action === 'createComment') {
     console.log('creating new comment');
-    await createComment(document);
+    createComment(document);
+    return true;
+  }
+
+  if (request.action === 'shareComments') {
+    // sendResponse(Promise.resolve(shareComments()))
+    shareComments().then(response => {
+      console.log('response', response);
+      sendResponse(response);
+    });
+    return true;
   }
 
   if (request.action === 'loadComments') {
-    await loadCommentsFromStorage();
+    // await loadCommentsFromStorage();
+    loadCommentsFromStorage();
+    return true;
   }
+
+  return false;
 });
 
 // Load comments when the page loads
