@@ -111,6 +111,10 @@ const shareComments = async () => {
     });
   }
 
+  // that this object, post request.
+  // the api will store this. return a share link which has an id.
+  // maybe for now just an id. Another browser will take this id ("load commens") and load them.
+
   return result;
 };
 
